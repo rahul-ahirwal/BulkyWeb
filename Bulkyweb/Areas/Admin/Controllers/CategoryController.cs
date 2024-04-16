@@ -1,5 +1,5 @@
 ﻿using Bulkyweb.DataAccess.Data;
-using Bulky.Models;
+using Bulky.Models.Models;
 using Microsoft.AspNetCore.Mvc;
 using Bulky.DataAccess.Repository.IRepository;
 
@@ -10,10 +10,9 @@ namespace Bulkyweb.Areas.Admin.Controllers
     {
         private readonly IUnitOfWork _unitOfWork;
 
-        public CategoryController(IUnitOfWork unitOfWork, IUnitOfWork unit)
+        public CategoryController(IUnitOfWork unitOfWork)
         {
             _unitOfWork = unitOfWork;
-            _unitOfWork = unit;
         }
 
         public IActionResult Index()
