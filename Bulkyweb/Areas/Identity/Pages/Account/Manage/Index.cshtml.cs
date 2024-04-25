@@ -11,17 +11,18 @@ using Bulky.Utility;
 using Microsoft.AspNetCore.Identity;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using Microsoft.EntityFrameworkCore;
 
 namespace Bulkyweb.Areas.Identity.Pages.Account.Manage
 {
     public class IndexModel : PageModel
     {
-        private readonly UserManager<IdentityUser> _userManager;
-        private readonly SignInManager<IdentityUser> _signInManager;
+        private readonly UserManager<ApplicationUser> _userManager;
+        private readonly SignInManager<ApplicationUser> _signInManager;
 
         public IndexModel(
-            UserManager<IdentityUser> userManager,
-            SignInManager<IdentityUser> signInManager
+            UserManager<ApplicationUser> userManager,
+            SignInManager<ApplicationUser> signInManager
             )
         {
             _userManager = userManager;
@@ -64,18 +65,20 @@ namespace Bulkyweb.Areas.Identity.Pages.Account.Manage
             public string Name { get; set; }
         }
 
-        private async Task LoadAsync(IdentityUser user)
+        private async Task LoadAsync(ApplicationUser user)
         {
             var userName = await _userManager.GetUserNameAsync(user);
             var phoneNumber = await _userManager.GetPhoneNumberAsync(user);
-            var userFromDb = _userManager.Users.FirstOrDefault(x => x.Id == user.Id);
-            var name = 
+            var name = user.Name;
             this.Username = userName;
-            Input = new InputModel
+            if (user != null)
             {
-                PhoneNumber = phoneNumber,
-                //Name = name,
-            };
+                Input = new InputModel
+                {
+                    PhoneNumber = phoneNumber,
+                    Name = name,
+                };
+            }
         }
 
         public async Task<IActionResult> OnGetAsync()
@@ -103,28 +106,18 @@ namespace Bulkyweb.Areas.Identity.Pages.Account.Manage
                 await LoadAsync(user);
                 return Page();
             }
-
-            var phoneNumber = await _userManager.GetPhoneNumberAsync(user);
-            if (Input.PhoneNumber != phoneNumber)
+            if (Input.Name != user.Name || Input.PhoneNumber != user.PhoneNumber)
             {
-                var setPhoneResult = await _userManager.SetPhoneNumberAsync(user, Input.PhoneNumber);
-                if (!setPhoneResult.Succeeded)
-                {
-                    StatusMessage = "Unexpected error when trying to set phone number.";
-                    return RedirectToPage();
-                }
-            }
-            var name = await _userManager.GetUserNameAsync(user);
-            if (Input.Name != name)
-            {
-                var setNameResult = await _userManager.SetUserNameAsync(user, Input.Name);
+                user.Name = Input.Name; 
+                user.PhoneNumber = Input.PhoneNumber;
+                var setNameResult = await _userManager.UpdateAsync(user);
+                
                 if (!setNameResult.Succeeded)
                 {
                     StatusMessage = "Unexpected error when trying to set phone number.";
                     return RedirectToPage();
                 }
             }
-
             await _signInManager.RefreshSignInAsync(user);
             StatusMessage = "Your profile has been updated";
             return RedirectToPage();

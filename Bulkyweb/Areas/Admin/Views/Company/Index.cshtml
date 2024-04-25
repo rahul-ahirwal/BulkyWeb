@@ -1,0 +1,50 @@
+﻿@model List<Bulky.Models.Models.Company>
+
+<div class="card shadow border-0 my-4">
+    <div class="card-header bg-secondary bg-gradient ml-0 py-3">
+        <div class="row">
+            <div class="col-12 text-center">
+                <h2 class="text-white py-2">Company List</h2>
+            </div>
+        </div>
+    </div>
+    <div class="card-body p-4">
+        <div class="row pt-4 mb-4">
+            <div class="col-12 text-end">
+                <a asp-controller="Company" asp-action="Upsert" class="btn btn-primary"><i class="bi bi-plus-circle"></i>  Create New</a>
+            </div>
+        </div>
+        <table class="table table-bordered table-striped">
+            <thead>
+                <tr>
+                    <th>Name</th>
+                    <th>City</th>
+                    <th>State</th>
+                    <th>Phone Number</th>
+                    <th></th>
+                </tr>
+            </thead>
+            <tbody>
+                @foreach (var company in Model)
+                {
+                    <tr>
+                        <td>@company.Name</td>
+                        <td>@company.City</td>
+                        <td>@company.State</td>
+                        <td>@company.PhoneNumber</td>
+                        <td>
+                            <div class="w-75 btn-group" role="group">
+                                <a asp-controller="Company" asp-action="Upsert" asp-route-id="@company.Id" class="btn btn-primary mx-2">
+                                    <i class="bi bi-pencil-square"></i> Edit
+                                </a>
+                                <a asp-controller="Company" asp-action="Delete" asp-route-id="@company.Id" class="btn btn-danger mx-2">
+                                    <i class="bi bi-trash3-fill"></i> Delete
+                                </a>
+                            </div>
+                        </td>
+                    </tr>
+                }
+            </tbody>
+        </table>
+    </div>
+</div>

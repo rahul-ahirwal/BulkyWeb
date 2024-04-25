@@ -1,0 +1,60 @@
+﻿@model Bulky.Models.Models.Company
+
+<div class="card shadow border-0 my-4">
+    <div class="card-header bg-secondary bg-gradient ml-0 py-3">
+        <div class="row">
+            <div class="col-12 text-center">
+                <h2 class="text-white py-2">Delete Company</h2>
+            </div>
+        </div>
+    </div>
+    <div class="card-body p-4">
+        <form method="post">
+            <input asp-for="Id" hidden />
+            <div class="border p-3 mt-4">
+                <div class="form-floating py-2 col-12">
+                    <input asp-for="Name" class="form-control border-0 shadow" disabled></input>
+                    <label asp-for="Name" type="text" class="ms-2"></label>
+                </div>
+                <div class="form-floating py-2 col-12">
+                    <textarea asp-for="StreetAddress" class="form-control border-0 shadow" disabled></textarea>
+                    <label asp-for="StreetAddress" class="ms-2"></label>
+                </div>
+                <div class="form-floating py-2 col-12">
+                    <input asp-for="City" class="form-control border-0 shadow" disabled></input>
+                    <label asp-for="City" class="ms-2"></label>
+                </div>
+                <div class="form-floating py-2 col-12">
+                    <input asp-for="State" class="form-control border-0 shadow" disabled></input>
+                    <label asp-for="State" class="ms-2"></label>
+                </div>
+                <div class="form-floating py-2 col-12">
+                    <input asp-for="PostalCode" class="form-control border-0 shadow" disabled></input>
+                    <label asp-for="PostalCode" class="ms-2"></label>
+                </div>
+                <div class="form-floating py-2 col-12">
+                    <input asp-for="PhoneNumber" class="form-control border-0 shadow" disabled></input>
+                    <label asp-for="PhoneNumber" class="ms-2"></label>
+                </div>
+                <div>
+                    <div class="row mt-3">
+                        <div class="col-6 col-md-3">
+                            <button type="submit" class="btn btn-danger form-control">Delete</button>
+                        </div>
+                        <div class="col-6 col-md-3">
+                        <a asp-controller="Company" asp-action="Index" class="btn btn-outline-secondary border form-control">Cancel</a>
+                        </div>
+                    </div>
+                </div>
+        </form>
+    </div>
+</div>
+
+
+@section Scripts
+{
+    <script src="~/js/product.js"></script>
+    @{
+        <partial name="_ValidationScriptsPartial" />
+    }
+}

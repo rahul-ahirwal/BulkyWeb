@@ -5,16 +5,19 @@ using Microsoft.EntityFrameworkCore;
 
 namespace Bulkyweb.DataAccess.Data
 {
-    public class ApplicationDbContext : IdentityDbContext<IdentityUser>
+    public class ApplicationDbContext : IdentityDbContext<ApplicationUser>
     {
-        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) 
-            : base(options)
+        public ApplicationDbContext(DbContextOptions<ApplicationDbContext> options) : base(options)
         {
             
         }
         public DbSet<Category> Categories { get; set; }
         public DbSet<Product> Products { get; set; }
         public DbSet<ApplicationUser> ApplicationUsers { get; set; }
+        public DbSet<Company> Companies { get; set; }
+        public DbSet<ShoppingCart> ShoppingCarts { get; set; }
+        public DbSet<OrderHeader> OrderHeaders { get; set; }
+        public DbSet<OrderDetail> OrderDetails { get; set; }
 
         protected override void OnModelCreating(ModelBuilder modelBuilder)
         {
@@ -108,6 +111,28 @@ namespace Bulkyweb.DataAccess.Data
                     Price100 = 20,
                     CategoryId = 16,
                     ImageUrl = ""
+                }
+               );
+            modelBuilder.Entity<Company>().HasData(
+                new Company 
+                { 
+                    Id = 1, 
+                    Name = "SuperTech Ltd.", 
+                    StreetAddress="EC-2", 
+                    City="Bangalore", 
+                    State="Telangana", 
+                    PhoneNumber= "9876543210", 
+                    PostalCode="345654" 
+                },
+                new Company 
+                { 
+                    Id = 2, 
+                    Name = "Super Ltd.", 
+                    StreetAddress="EC-1", 
+                    City="Bangalore", 
+                    State="Telangana", 
+                    PhoneNumber= "9876545550", 
+                    PostalCode="333334" 
                 }
                );
             base.OnModelCreating(modelBuilder);
