@@ -1,4 +1,6 @@
 ﻿@using Microsoft.AspNetCore.Identity
+@using Microsoft.AspNetCore.Http
+@inject IHttpContextAccessor HttpContextAccessor
 
 @inject SignInManager<ApplicationUser> SignInManager
 @inject UserManager<ApplicationUser> UserManager
@@ -6,9 +8,23 @@
 <ul class="navbar-nav">
     @if (SignInManager.IsSignedIn(User))
     {
-        <li class="nav-item">
-            <a id="cart" class="nav-link " asp-area="Customer" asp-controller="Cart" asp-action="Index"><i class="bi bi-cart"></i></a>
-        </li>
+        @if(HttpContextAccessor.HttpContext.Session.GetInt32(StaticDetails.SessionCart) != null)
+        {
+            <li class="nav-item">
+                <a id="cart" class="nav-link " asp-area="Customer" asp-controller="Cart" asp-action="Index"><i class="bi bi-cart"></i>
+                    &nbsp; @HttpContextAccessor.HttpContext.Session.GetInt32(StaticDetails.SessionCart)
+                </a>
+            </li>
+        }
+        else
+        {
+            <li class="nav-item">
+                <a id="cart" class="nav-link " asp-area="Customer" asp-controller="Cart" asp-action="Index">
+                    <i class="bi bi-cart"></i>
+                    &nbsp; 0
+                </a>
+            </li>
+        }
         <li class="nav-item">
             <a id="manage" class="nav-link " asp-area="Identity" asp-page="/Account/Manage/Index" title="Manage">Hello @UserManager.GetUserName(User)!</a>
         </li>

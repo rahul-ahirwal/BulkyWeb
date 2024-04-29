@@ -14,7 +14,7 @@ builder.Services.AddControllersWithViews();
 builder.Services.AddDbContext<ApplicationDbContext>(options =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
-    //options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
+    options.UseQueryTrackingBehavior(QueryTrackingBehavior.NoTracking);
 });
 
 //Bind properties from appSettings.json to the StripeSettings class
@@ -33,7 +33,13 @@ builder.Services.ConfigureApplicationCookie(options =>
 
 builder.Services.AddScoped<IUnitOfWork, UnitOfWork>();
 builder.Services.AddScoped<IEmailSender, EmailSender>();
-
+builder.Services.AddDistributedMemoryCache();
+builder.Services.AddSession(options =>
+{
+    options.IdleTimeout = TimeSpan.FromMinutes(100);
+    options.Cookie.HttpOnly = true;
+    options.Cookie.IsEssential = true;
+});
 builder.Services.AddRazorPages();
 var app = builder.Build();
 
@@ -49,6 +55,7 @@ StripeConfiguration.ApiKey = builder.Configuration.GetSection("StripePayment:Sec
 app.UseRouting();
 app.UseAuthentication();
 app.UseAuthorization();
+app.UseSession();
 app.MapRazorPages();
 app.MapControllerRoute(
     name: "default",

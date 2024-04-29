@@ -27,7 +27,9 @@ namespace Bulkyweb.Areas.Customer.Controllers
 			IEnumerable<ShoppingCart> shoppingCart = _unitOfWork.ShoppingCart.GetAll(includeProperties: "Product").Where(i => i.ApplicationUserId == UserId).ToList();
 			double orderTotal = 0;
 
-			foreach (var cartItem in shoppingCart)
+            HttpContext.Session.SetInt32(StaticDetails.SessionCart, _unitOfWork.ShoppingCart
+                .GetAll().Where(u => u.ApplicationUserId == UserId).Count());
+            foreach (var cartItem in shoppingCart)
 			{
 				orderTotal += GetPriceBasedOnQuantity(cartItem) * cartItem.Count;
 			}
@@ -98,7 +100,8 @@ namespace Bulkyweb.Areas.Customer.Controllers
 			{
 				shoppingCartVM.OrderHeader.OrderStatus = StaticDetails.OrderStatus_Approved;
 				shoppingCartVM.OrderHeader.PaymentStatus = StaticDetails.PaymentStatus_DelayedPayment;
-			}
+				shoppingCartVM.OrderHeader.PaymentDueDate = DateOnly.FromDateTime(DateTime.Now.AddDays(30));
+            }
 
 			_unitOfWork.OrderHeader.Add(shoppingCartVM.OrderHeader);
 			_unitOfWork.Save();
@@ -155,15 +158,22 @@ namespace Bulkyweb.Areas.Customer.Controllers
 		}
 
 		public IActionResult OrderConfirmation(int id)
-		{
-			OrderHeader order = _unitOfWork.OrderHeader.Get(o => o.Id == id, includeProperties: "ApplicationUser");
-			var service = new SessionService();
-			Session session = service.Get(order.SessionId);
-			if(session.PaymentStatus.ToLower() == "paid")
+        {
+            var claimsIdentity = (ClaimsIdentity)User.Identity;
+            var UserId = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier).Value;
+            ApplicationUser applicationUser = _unitOfWork.ApplicationUser.Get(au => au.Id == UserId);
+			OrderHeader order = new OrderHeader();
+            if (applicationUser.CompanyId.GetValueOrDefault() == 0)
 			{
-				_unitOfWork.OrderHeader.UpdateStripePaymentID(id, session.Id, session.PaymentIntentId);
-				_unitOfWork.OrderHeader.UpdateStatus(id, StaticDetails.OrderStatus_Approved, StaticDetails.PaymentStatus_Approved);
-				_unitOfWork.Save();
+			    order = _unitOfWork.OrderHeader.Get(o => o.Id == id, includeProperties: "ApplicationUser");
+				var service = new SessionService();
+				Session session = service.Get(order.SessionId);
+				if (session.PaymentStatus.ToLower() == "paid")
+				{
+					_unitOfWork.OrderHeader.UpdateStripePaymentID(id, session.Id, session.PaymentIntentId);
+					_unitOfWork.OrderHeader.UpdateStatus(id, StaticDetails.OrderStatus_Approved, StaticDetails.PaymentStatus_Approved);
+					_unitOfWork.Save();
+				} 
 			}
 			List<ShoppingCart> shoppingCart = _unitOfWork.ShoppingCart.GetAll()
 				.Where(s => s.ApplicationUserId == order.ApplicationUserId).ToList();
@@ -178,7 +188,11 @@ namespace Bulkyweb.Areas.Customer.Controllers
 			item.Count++;
 			_unitOfWork.ShoppingCart.Update(item);
 			_unitOfWork.Save();
-			return RedirectToAction(nameof(Index));
+            var claimsIdentity = (ClaimsIdentity)User.Identity;
+            var UserId = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier).Value;
+            HttpContext.Session.SetInt32(StaticDetails.SessionCart, _unitOfWork.ShoppingCart
+                .GetAll().Where(u => u.ApplicationUserId == UserId).Count());
+            return RedirectToAction(nameof(Index));
 		}
 
 		public IActionResult DecreaseCount(int id)
@@ -194,7 +208,11 @@ namespace Bulkyweb.Areas.Customer.Controllers
 				_unitOfWork.ShoppingCart.Update(item);
 			}
 			_unitOfWork.Save();
-			return RedirectToAction(nameof(Index));
+            var claimsIdentity = (ClaimsIdentity)User.Identity;
+            var UserId = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier).Value;
+            HttpContext.Session.SetInt32(StaticDetails.SessionCart, _unitOfWork.ShoppingCart
+                .GetAll().Where(u => u.ApplicationUserId == UserId).Count());
+            return RedirectToAction(nameof(Index));
 		}
 
 		public IActionResult RemoveItem(int id)
@@ -202,7 +220,11 @@ namespace Bulkyweb.Areas.Customer.Controllers
 			ShoppingCart item = _unitOfWork.ShoppingCart.Get(sc => sc.Id == id);
 			_unitOfWork.ShoppingCart.Remove(item);
 			_unitOfWork.Save();
-			return RedirectToAction(nameof(Index));
+            var claimsIdentity = (ClaimsIdentity)User.Identity;
+            var UserId = claimsIdentity.FindFirst(ClaimTypes.NameIdentifier).Value;
+            HttpContext.Session.SetInt32(StaticDetails.SessionCart, _unitOfWork.ShoppingCart
+                .GetAll().Where(u => u.ApplicationUserId == UserId).Count());
+            return RedirectToAction(nameof(Index));
 		}
 
 		#region Private methods

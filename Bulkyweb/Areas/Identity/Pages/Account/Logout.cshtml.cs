@@ -10,6 +10,7 @@ using Bulky.Models.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using Microsoft.Extensions.Logging;
+using Bulky.Utility;
 
 namespace Bulkyweb.Areas.Identity.Pages.Account
 {
@@ -19,7 +20,7 @@ namespace Bulkyweb.Areas.Identity.Pages.Account
         private readonly ILogger<LogoutModel> _logger;
 
         public LogoutModel(SignInManager<ApplicationUser> signInManager, ILogger<LogoutModel> logger)
-        {
+        { 
             _signInManager = signInManager;
             _logger = logger;
         }
@@ -27,6 +28,7 @@ namespace Bulkyweb.Areas.Identity.Pages.Account
         public async Task<IActionResult> OnPost(string returnUrl = null)
         {
             await _signInManager.SignOutAsync();
+            HttpContext.Session.Remove(StaticDetails.SessionCart);
             _logger.LogInformation("User logged out.");
             if (returnUrl != null)
             {

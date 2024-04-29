@@ -1,0 +1,18 @@
+﻿@model int
+
+<div class="container row pt-4 pb-8">
+    <div class="col-12 text-center">
+        <h2 class="text-primary text-center">
+            Payment Successful!
+        </h2>
+        Your Order number is : @Model
+        </br>
+        </br>
+        <img src="~/images/lawn_leaf.jpg" width="65%" />
+    </div>
+    <div class="col-12 text-center" style="color:maroon">
+        </br>
+        Your payment has been done successfully!!
+        <a asp-area="Admin" asp-controller="Order" asp-action="Details" asp-route-orderId="@Model" class="btn btn-primary">Back to Order details</a>
+    </div>
+</div>
